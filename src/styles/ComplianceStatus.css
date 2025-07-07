@@ -1,0 +1,236 @@
+.compliance-status {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.compliance-section {
+  background-color: var(--background-panel);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.compliance-section.expanded {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-light);
+}
+
+.section-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.status-indicator.compliant {
+  background-color: var(--alert-green);
+}
+
+.status-indicator.warning {
+  background-color: var(--alert-yellow);
+}
+
+.status-indicator.violation {
+  background-color: var(--alert-red);
+}
+
+.expand-icon {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.section-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.expanded .section-content {
+  max-height: 500px;
+  padding: 1rem;
+}
+
+/* ISA Standards Table */
+.standards-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.standards-table th,
+.standards-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.standards-table th {
+  color: var(--text-dim);
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.standards-table td {
+  font-size: 0.9rem;
+}
+
+.standard-id {
+  font-family: var(--ff-heading);
+  color: var(--primary-color);
+}
+
+.standard-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.standard-status-text.compliant {
+  color: var(--alert-green);
+}
+
+.standard-status-text.warning {
+  color: var(--alert-yellow);
+}
+
+.standard-status-text.violation {
+  color: var(--alert-red);
+}
+
+/* Zone Time Display */
+.zone-times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.zone-item {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
+.zone-name {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.zone-time {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.zone-limit {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 0.25rem;
+}
+
+/* Reporting Status */
+.reporting-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.report-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.report-label {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.report-value {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.up-to-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(6, 214, 160, 0.1);
+  border-radius: 4px;
+}
+
+.up-to-date.warning {
+  background-color: rgba(255, 209, 102, 0.1);
+}
+
+.up-to-date-icon {
+  color: var(--alert-green);
+}
+
+.up-to-date.warning .up-to-date-icon {
+  color: var(--alert-yellow);
+}
+
+.up-to-date-text {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+/* Action Buttons */
+.compliance-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.action-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.action-button.secondary {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.action-button.secondary:hover {
+  background-color: rgba(0, 180, 216, 0.1);
+}
