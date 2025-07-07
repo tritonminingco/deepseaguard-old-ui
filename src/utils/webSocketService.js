@@ -34,9 +34,15 @@ class WebSocketService {
     this.onAlert = null;
   }
 
-  connect(backendUrl = (window.location.origin.replace(/^http/, 'ws') + '/ws')) {
-    console.log('🔌 Connecting to DeepSeaGuard backend:', backendUrl);
-    this.socket = io(backendUrl, {
+  connect(backendUrl) {
+    // Prefer explicit backend URL from env, fallback to localhost:5000
+    const wsUrl =
+      backendUrl ||
+      (import.meta && import.meta.env && import.meta.env.VITE_WS_URL)
+        ? import.meta.env.VITE_WS_URL
+        : 'ws://localhost:5000/ws';
+    console.log('🔌 Connecting to DeepSeaGuard backend:', wsUrl);
+    this.socket = io(wsUrl, {
       transports: ['websocket', 'polling'],
       timeout: 10000,
       forceNew: true
@@ -231,7 +237,7 @@ class WebSocketService {
 // Create singleton instance
 const webSocketService = new WebSocketService();
 
-// Auto-connect when module loads
+// Auto-connect when module loads (use env or fallback)
 webSocketService.connect();
 
 export default webSocketService;

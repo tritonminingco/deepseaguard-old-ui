@@ -1,29 +1,13 @@
-import ConfigPanel from './components/ConfigPanel';
-  // Modal state for config panel
-  const [configModalOpen, setConfigModalOpen] = useState(false);
-      {/* Config Panel Modal */}
-      {configModalOpen && (
-        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.4)', zIndex: 5000 }}>
-          <div className="modal-content" style={{ position: 'relative', margin: '5vh auto', background: '#fff', borderRadius: 8, maxWidth: 700, padding: 32, boxShadow: '0 8px 32px #0003' }}>
-            <button style={{ position: 'absolute', top: 12, right: 12, fontSize: 24, background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setConfigModalOpen(false)}>×</button>
-            <ConfigPanel />
-          </div>
-        </div>
-      )}
-/**
- * DeepSeaGuard Scientific Workstation
- * Professional interface for marine scientists and ISA compliance officers
- * Dense, information-rich layout optimized for technical users
- */
-
 // =========================
 // DeepSeaGuard Main App Component
 // =========================
+// All imports must be at the top
+import React, { useState, useEffect, useRef } from 'react';
+import ConfigPanel from './components/ConfigPanel';
 // This is the main dashboard for marine science and ISA compliance.
 // It manages all state, WebSocket connections, and renders all panels.
 //
 // --- React and core libraries ---
-import React, { useState, useEffect, useRef } from 'react';
 // --- Map and chart libraries ---
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';

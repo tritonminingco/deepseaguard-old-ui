@@ -33,7 +33,7 @@ function Header({ timeFrame, onTimeFrameChange, alerts, onAlertClick, darkMode, 
         <div className="header-left">
           <div className="logo-section">
             <div className="logo">
-              <span className="logo-icon">🌊</span>
+              <img src="/logo.svg" alt="DeepSeaGuard Logo" className="logo-icon" style={{ width: 40, height: 40, marginRight: 12 }} />
               <div className="logo-text">
                 <h1>DeepSeaGuard</h1>
                 <span className="subtitle">Compliance Dashboard</span>
