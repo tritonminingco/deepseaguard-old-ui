@@ -9,51 +9,24 @@ function DataPanel({ selectedAUV, timeFrame, alerts = [] }) {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Mock data based on selected AUV and time frame
+  // Fetch real data from backend API
   useEffect(() => {
     setLoading(true);
-    
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      const mockData = {
-        environmental: {
-          temperature: selectedAUV === 'AUV-001' ? 4.2 : selectedAUV === 'AUV-002' ? 4.5 : 4.1,
-          salinity: selectedAUV === 'AUV-001' ? 34.8 : selectedAUV === 'AUV-002' ? 34.6 : 34.9,
-          dissolvedOxygen: selectedAUV === 'AUV-001' ? 6.5 : selectedAUV === 'AUV-002' ? 6.2 : 6.8,
-          pH: selectedAUV === 'AUV-001' ? 8.1 : selectedAUV === 'AUV-002' ? 8.0 : 8.2,
-          turbidity: selectedAUV === 'AUV-001' ? 2.3 : selectedAUV === 'AUV-002' ? 3.1 : 1.9,
-          pressure: selectedAUV === 'AUV-001' ? 250.7 : selectedAUV === 'AUV-002' ? 245.2 : 258.3,
-          waterQuality: selectedAUV === 'AUV-001' ? 'Good' : selectedAUV === 'AUV-002' ? 'Fair' : 'Excellent',
-          speciesProximity: selectedAUV === 'AUV-003' ? 'Benthic Octopod - 120m' : 'None detected'
-        },
-        operational: {
-          batteryLevel: selectedAUV === 'AUV-001' ? 85 : selectedAUV === 'AUV-002' ? 32 : 67,
-          depth: selectedAUV === 'AUV-001' ? 2450 : selectedAUV === 'AUV-002' ? 2380 : 2520,
-          speed: selectedAUV === 'AUV-001' ? 2.3 : selectedAUV === 'AUV-002' ? 1.8 : 2.1,
-          heading: selectedAUV === 'AUV-001' ? 142 : selectedAUV === 'AUV-002' ? 89 : 215,
-          missionId: selectedAUV === 'AUV-001' ? 'MISSION-001' : selectedAUV === 'AUV-002' ? 'MISSION-002' : 'MISSION-003',
-          missionDuration: selectedAUV === 'AUV-001' ? '4h 23m' : selectedAUV === 'AUV-002' ? '6h 12m' : '3h 45m',
-          missionProgress: selectedAUV === 'AUV-001' ? 67 : selectedAUV === 'AUV-002' ? 45 : 78,
-          nodulesCollected: selectedAUV === 'AUV-001' ? 1247 : selectedAUV === 'AUV-002' ? 892 : 1456,
-          collectionRate: selectedAUV === 'AUV-001' ? 4.8 : selectedAUV === 'AUV-002' ? 2.4 : 6.5,
-          efficiency: selectedAUV === 'AUV-001' ? 87 : selectedAUV === 'AUV-002' ? 65 : 92
-        },
-        compliance: {
-          isaCompliance: 'Compliant',
-          lastReport: '2024-06-24 14:30:00',
-          violations: selectedAUV === 'AUV-002' ? 1 : 0,
-          status: selectedAUV === 'AUV-002' ? 'Warning' : 'Active',
-          sedimentThreshold: selectedAUV === 'AUV-002' ? 23.7 : 18.5,
-          sensitiveZoneTime: selectedAUV === 'AUV-003' ? '2h 15m' : '0m',
-          reportingStatus: 'Up to date'
-        }
-      };
-      
-      setData(mockData);
+    async function fetchData() {
+      try {
+        const [environmental, operational, compliance] = await Promise.all([
+          // Replace with your actual API endpoints
+          window.apiClient.fetchData(`/telemetry/environmental?auv=${selectedAUV}&timeFrame=${timeFrame}`),
+          window.apiClient.fetchData(`/telemetry/operational?auv=${selectedAUV}&timeFrame=${timeFrame}`),
+          window.apiClient.fetchData(`/compliance/status?auv=${selectedAUV}&timeFrame=${timeFrame}`)
+        ]);
+        setData({ environmental, operational, compliance });
+      } catch (err) {
+        setData({});
+      }
       setLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
+    }
+    fetchData();
   }, [selectedAUV, timeFrame]);
 
   const tabs = [

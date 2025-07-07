@@ -1,3 +1,15 @@
+import ConfigPanel from './components/ConfigPanel';
+  // Modal state for config panel
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+      {/* Config Panel Modal */}
+      {configModalOpen && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.4)', zIndex: 5000 }}>
+          <div className="modal-content" style={{ position: 'relative', margin: '5vh auto', background: '#fff', borderRadius: 8, maxWidth: 700, padding: 32, boxShadow: '0 8px 32px #0003' }}>
+            <button style={{ position: 'absolute', top: 12, right: 12, fontSize: 24, background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setConfigModalOpen(false)}>×</button>
+            <ConfigPanel />
+          </div>
+        </div>
+      )}
 /**
  * DeepSeaGuard Scientific Workstation
  * Professional interface for marine scientists and ISA compliance officers
@@ -187,7 +199,60 @@ function App() {
   };
   // Simulate export action
   const handleExport = (type) => {
-    addEvent(`Exported ${type} data`, 'system');
+    // Map export type to backend endpoint and file type
+    let endpoint = '';
+    let filename = '';
+    let filetype = 'csv';
+    switch (type) {
+      case 'telemetry':
+        endpoint = '/export/telemetry';
+        filename = 'telemetry.csv';
+        break;
+      case 'environmental':
+        endpoint = '/export/environmental';
+        filename = 'environmental.csv';
+        break;
+      case 'compliance':
+        endpoint = '/export/compliance';
+        filename = 'compliance.csv';
+        break;
+      case 'eventlog':
+        endpoint = '/export/eventlog';
+        filename = 'eventlog.csv';
+        break;
+      case 'all':
+        endpoint = '/export/all';
+        filename = 'deepseaguard_export.json';
+        filetype = 'json';
+        break;
+      default:
+        return;
+    }
+
+    // Download file from backend
+    fetch(window.apiClient?.API_CONFIG?.baseUrl + endpoint, {
+      method: 'GET',
+      headers: {
+        'Authorization': window.apiClient?.getAuthToken ? `Bearer ${window.apiClient.getAuthToken()}` : undefined
+      }
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Export failed');
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        addEvent(`Exported ${type} data`, 'system');
+      })
+      .catch((err) => {
+        addEvent(`Export failed: ${type}`, 'error', err);
+        alert('Export failed. Please try again.');
+      });
   };
   // Open compliance rule drawer
   const handleRuleClick = (rule) => {
@@ -254,6 +319,9 @@ function App() {
           <ExportCenter onExport={handleExport} />
           <UserManagementPanel users={demoUsers} onSwitch={handleUserSwitch} />
           <SystemHealthPanel health={demoHealth} />
+          <button className="btn w-full" style={{ margin: '12px 0' }} onClick={() => setConfigModalOpen(true)}>
+            Configure AUVs & ISA Rules
+          </button>
           <AuvCommandConsole onCommand={handleAuvCommand} />
           <IsaRegulationReferencePanel onRuleClick={handleRuleClick} />
           {/* Existing panels for Telemetry, Environmental, Compliance, etc. */}

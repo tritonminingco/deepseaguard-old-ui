@@ -59,92 +59,30 @@ function MapView({ timeFrame, selectedAUV, onAUVSelect, playbackSpeed }) {
   const [mapZoom] = useState(8);
   const mapRef = useRef();
 
-  // Mock AUV data
+  // Fetch AUV data from backend
   useEffect(() => {
-    const mockAUVs = [
-      {
-        id: 'AUV-001',
-        lat: -12.05,
-        lng: -77.03,
-        status: 'active',
-        battery: 85,
-        depth: 2450,
-        speed: 2.3,
-        heading: 142,
-        mission: {
-          id: 'MISSION-001',
-          duration: '4h 23m',
-          progress: 67,
-          nodulesCollected: 1247
-        }
-      },
-      {
-        id: 'AUV-002',
-        lat: -12.08,
-        lng: -77.01,
-        status: 'warning',
-        battery: 32,
-        depth: 2380,
-        speed: 1.8,
-        heading: 89,
-        mission: {
-          id: 'MISSION-002',
-          duration: '6h 12m',
-          progress: 45,
-          nodulesCollected: 892
-        }
-      },
-      {
-        id: 'AUV-003',
-        lat: -12.02,
-        lng: -77.05,
-        status: 'active',
-        battery: 67,
-        depth: 2520,
-        speed: 2.1,
-        heading: 215,
-        mission: {
-          id: 'MISSION-003',
-          duration: '3h 45m',
-          progress: 78,
-          nodulesCollected: 1456
-        }
+    async function fetchAUVs() {
+      try {
+        const auvs = await window.apiClient.fetchData(`/telemetry/auvs?timeFrame=${timeFrame}`);
+        setAuvs(auvs || []);
+      } catch (err) {
+        setAuvs([]);
       }
-    ];
-    
-    setAuvs(mockAUVs);
+    }
+    fetchAUVs();
   }, [timeFrame]);
 
-  // Mock sediment plume data
+  // Fetch sediment plume data from backend
   useEffect(() => {
-    const mockPlumes = [
-      {
-        id: 'plume-1',
-        lat: -12.06,
-        lng: -77.02,
-        intensity: 0.8,
-        radius: 200,
-        sedimentLevel: 18.5 // mg/L
-      },
-      {
-        id: 'plume-2',
-        lat: -12.04,
-        lng: -77.04,
-        intensity: 0.6,
-        radius: 150,
-        sedimentLevel: 12.3 // mg/L
-      },
-      {
-        id: 'plume-3',
-        lat: -12.09,
-        lng: -77.01,
-        intensity: 0.9,
-        radius: 250,
-        sedimentLevel: 23.7 // mg/L (above 25 mg/L threshold)
+    async function fetchPlumes() {
+      try {
+        const plumes = await window.apiClient.fetchData(`/telemetry/sediment_plumes?timeFrame=${timeFrame}`);
+        setSedimentPlumes(plumes || []);
+      } catch (err) {
+        setSedimentPlumes([]);
       }
-    ];
-    
-    setSedimentPlumes(mockPlumes);
+    }
+    fetchPlumes();
   }, [timeFrame]);
 
   const handleAUVClick = (auvId) => {

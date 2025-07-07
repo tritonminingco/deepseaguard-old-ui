@@ -122,8 +122,8 @@ export async function logout() {
  * @returns {Promise} - Promise with response data
  */
 export async function fetchData(endpoint, options = {}, retryCount = 0) {
-  // For development, always return mock data
-  if (true) {
+  // Use mock data only if REACT_APP_USE_MOCKS is set (for dev/demo)
+  if (process.env.REACT_APP_USE_MOCKS === 'true') {
     console.log(`Using mock data for endpoint: ${endpoint}`);
     return getMockData(endpoint);
   }
