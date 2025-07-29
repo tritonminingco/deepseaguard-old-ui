@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fourier Series Animation</title>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #plot {
+            width: 80%;
+            height: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div id="plot"></div>
+
+    <script>
+        // Function to compute the Fourier series approximation
+        function fourierSeries(func, T, nTerms, t) {
+            const omega = 2 * Math.PI / T;
+            const dt = T / 1000;
+            let a0 = 0;
+
+            for (let i = 0; i < 1000; i++) {
+                const x = i * dt;
+                a0 += func(x) * dt;
+            }
+            a0 *= 2 / T;
+
+            let result = Array(t.length).fill(a0 / 2);
+
+            for (let n = 1; n <= nTerms; n++) {
+                let an = 0;
+                let bn = 0;
+
+                for (let i = 0; i < 1000; i++) {
+                    const x = i * dt;
+                    an += func(x) * Math.cos(n * omega * x) * dt;
+                    bn += func(x) * Math.sin(n * omega * x) * dt;
+                }
+                an *= 2 / T;
+                bn *= 2 / T;
+
+                for (let i = 0; i < t.length; i++) {
+                    result[i] += an * Math.cos(n * omega * t[i]) + bn * Math.sin(n * omega * t[i]);
+                }
+            }
+
+            return result;
+        }
+
+        // Example periodic function: Simulated underwater robot oscillation
+        function robotOscillation(t) {
+            return Math.sin(t) + 0.5 * Math.sin(2 * t);
+        }
+
+        // Time points and parameters
+        const T = 2 * Math.PI;
+        const t = Array.from({ length: 1000 }, (_, i) => i * (2 * T / 1000));
+
+        // Initialize Plotly plot
+        const layout = {
+            title: "Fourier Series Stabilization of Underwater Robot Movements",
+            xaxis: { title: "Time" },
+            yaxis: { title: "Amplitude" },
+        };
+
+        const originalTrace = {
+            x: t,
+            y: t.map(robotOscillation),
+            mode: "lines",
+            name: "Original Oscillation",
+            line: { dash: "dash" },
+        };
+
+        const approxTrace = {
+            x: t,
+            y: Array(t.length).fill(0),
+            mode: "lines",
+            name: "Fourier Approximation",
+        };
+
+        Plotly.newPlot("plot", [originalTrace, approxTrace], layout);
+
+        // Animation loop
+        let nTerms = 1;
+        function updatePlot() {
+            const approx = fourierSeries(robotOscillation, T, nTerms, t);
+            Plotly.animate("plot", {
+                data: [{ y: approx }],
+                traces: [1],
+                layout: {},
+            }, {
+                transition: {
+                    duration: 500,
+                    easing: "cubic-in-out"
+                },
+                frame: {
+                    duration: 500,
+                    redraw: false
+                }
+            });
+
+            nTerms++;
+            if (nTerms <= 10) {
+                setTimeout(updatePlot, 500);
+            }
+        }
+
+        updatePlot();
+    </script>
+</body>
+</html>

@@ -1,14 +1,28 @@
 // =========================
 // DeepSeaGuard Main App Component
 // =========================
-// All imports must be at the top
+// This file serves as the main entry point for the DeepSeaGuard frontend application.
+// It initializes the dashboard, manages global state, and renders all major components.
+
+// Import React and necessary hooks for state management and lifecycle methods
 import React, { useState, useEffect, useRef } from 'react';
+
+// Import custom components for the dashboard
 import ConfigPanel from './components/ConfigPanel';
-// This is the main dashboard for marine science and ISA compliance.
-// It manages all state, WebSocket connections, and renders all panels.
-//
-// --- React and core libraries ---
-// --- Map and chart libraries ---
+import AlertFilterPanel from './components/AlertFilterPanel';
+import AuvMissionTimeline from './components/AuvMissionTimeline';
+import ComplianceRuleDrawer from './components/ComplianceRuleDrawer';
+import ExportCenter from './components/ExportCenter';
+import UserManagementPanel from './components/UserManagementPanel';
+import SystemHealthPanel from './components/SystemHealthPanel';
+import AuvCommandConsole from './components/AuvCommandConsole';
+import IsaRegulationReferencePanel from './components/IsaRegulationReferencePanel';
+
+// Import utility functions and services
+import webSocketService from './utils/webSocketService';
+
+// Import styles and libraries
+import './index.css';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -23,31 +37,27 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-// Register chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-// --- Custom dashboard components ---
-import webSocketService from './utils/webSocketService';
-import './index.css';
-import AlertFilterPanel from './components/AlertFilterPanel';
-import AuvMissionTimeline from './components/AuvMissionTimeline';
-import ComplianceRuleDrawer from './components/ComplianceRuleDrawer';
-import ExportCenter from './components/ExportCenter';
-import UserManagementPanel from './components/UserManagementPanel';
-import SystemHealthPanel from './components/SystemHealthPanel';
-import AuvCommandConsole from './components/AuvCommandConsole';
-import IsaRegulationReferencePanel from './components/IsaRegulationReferencePanel';
 
+// Register chart.js components for data visualization
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+/**
+ * Main App Component
+ * 
+ * This component serves as the root of the DeepSeaGuard dashboard application.
+ * It manages global state, WebSocket connections, and renders all major panels.
+ */
 function App() {
   // --- Core application state ---
-  // WebSocket connection status
+  // WebSocket connection status (e.g., connected, disconnected)
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
-  // Currently selected AUV for all panels
+  // Currently selected AUV (Autonomous Underwater Vehicle) for all panels
   const [selectedAUV, setSelectedAUV] = useState('AUV-001');
-  // Time frame for data panels (live, 1h, etc.)
+  // Time frame for data panels (e.g., live, 1h, 24h)
   const [timeFrame, setTimeFrame] = useState('live');
   // All AUV data keyed by AUV ID
   const [auvData, setAuvData] = useState({});
-  // List of recent alerts
+  // List of recent alerts for the alert system
   const [alerts, setAlerts] = useState([]);
   // Timestamp of last telemetry update
   const [lastUpdate, setLastUpdate] = useState(null);
@@ -85,6 +95,7 @@ function App() {
     { id: 3, name: 'Operator', role: 'Operator', active: false }
   ]);
 
+  
   // --- Effects ---
   // Sync dark mode with localStorage and body class
   useEffect(() => {
@@ -1038,6 +1049,5 @@ function Modal({ modal, onClose, darkMode }) {
     </div>
   );
 }
-// (Removed duplicate JSX block from file end, now only in CompliancePanel)
 export default App;
 
