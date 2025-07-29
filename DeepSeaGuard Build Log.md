@@ -1,3 +1,6 @@
+> 🚧 **Build Log:** [View live progress here](./build-log.md)
+
+
 # DeepSeaGuard Build Log  
 _Real-time monitoring and compliance system for deep-sea operations_  
 Maintained by Triton Mining Co.  
