@@ -1,0 +1,218 @@
+/* Loading Spinner Styles */
+
+/* Container Variants */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loading-container--inline {
+  display: inline-flex;
+  padding: 8px 12px;
+}
+
+.loading-container--overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.loading-backdrop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Base Spinner */
+.loading-spinner {
+  position: relative;
+  display: inline-block;
+}
+
+/* Size Variants */
+.loading-spinner--small {
+  width: 24px;
+  height: 24px;
+}
+
+.loading-spinner--medium {
+  width: 48px;
+  height: 48px;
+}
+
+.loading-spinner--large {
+  width: 72px;
+  height: 72px;
+}
+
+/* Spinner Rings */
+.loading-spinner__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  animation: loading-spin 1.5s linear infinite;
+}
+
+.loading-spinner__ring:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-spinner__ring:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.loading-spinner__ring:nth-child(3) {
+  animation-delay: 1s;
+}
+
+/* Color Variants */
+.loading-spinner--primary .loading-spinner__ring {
+  border-top-color: #4299e1;
+  border-right-color: rgba(66, 153, 225, 0.3);
+}
+
+.loading-spinner--secondary .loading-spinner__ring {
+  border-top-color: #718096;
+  border-right-color: rgba(113, 128, 150, 0.3);
+}
+
+.loading-spinner--marine .loading-spinner__ring {
+  border-top-color: #0891b2;
+  border-right-color: rgba(8, 145, 178, 0.3);
+}
+
+.loading-spinner--white .loading-spinner__ring {
+  border-top-color: #ffffff;
+  border-right-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Animation */
+@keyframes loading-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading Text */
+.loading-text {
+  margin-top: 16px;
+  color: #4a5568;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.loading-container--inline .loading-text {
+  margin-top: 0;
+  margin-left: 8px;
+  font-size: 0.875rem;
+}
+
+.loading-content .loading-text {
+  color: #2d3748;
+  font-size: 1.1rem;
+}
+
+/* Marine Theme Enhancement */
+.loading-spinner--marine .loading-spinner__ring:nth-child(1) {
+  border-top-color: #0891b2;
+  border-right-color: rgba(8, 145, 178, 0.2);
+}
+
+.loading-spinner--marine .loading-spinner__ring:nth-child(2) {
+  border-top-color: #0e7490;
+  border-right-color: rgba(14, 116, 144, 0.2);
+}
+
+.loading-spinner--marine .loading-spinner__ring:nth-child(3) {
+  border-top-color: #155e75;
+  border-right-color: rgba(21, 94, 117, 0.2);
+}
+
+/* Pulse Animation for Marine Theme */
+.loading-spinner--marine {
+  animation: marine-pulse 2s ease-in-out infinite;
+}
+
+@keyframes marine-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .loading-content {
+    padding: 24px;
+    margin: 20px;
+  }
+  
+  .loading-spinner--large {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .loading-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner__ring {
+    animation: none;
+    border-top-color: transparent;
+    border-right-color: currentColor;
+  }
+  
+  .loading-spinner--marine {
+    animation: none;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .loading-content {
+    background: #2d3748;
+    color: #f7fafc;
+  }
+  
+  .loading-content .loading-text {
+    color: #e2e8f0;
+  }
+  
+  .loading-text {
+    color: #a0aec0;
+  }
+}
