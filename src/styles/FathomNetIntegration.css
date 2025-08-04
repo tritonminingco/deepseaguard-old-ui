@@ -1,0 +1,287 @@
+/* Enhanced Alert System with FathomNet Integration */
+.alert-system.enhanced {
+  width: 90vw;
+  max-width: 1200px;
+  max-height: 90vh;
+}
+
+.alert-system.enhanced .alert-item {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.alert-system.enhanced .alert-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Species Information Styles */
+.species-info {
+  margin-top: 12px;
+  border-top: 1px solid #334155;
+  padding-top: 12px;
+}
+
+.species-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.species-header:hover {
+  background: rgba(51, 65, 85, 0.3);
+}
+
+.species-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.species-icon {
+  font-size: 16px;
+}
+
+.species-name {
+  font-weight: 600;
+  color: #3b82f6;
+  font-style: italic;
+}
+
+.distance {
+  font-size: 12px;
+  color: #f59e42;
+  background: rgba(245, 158, 66, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.expand-btn:hover {
+  background: rgba(51, 65, 85, 0.5);
+  color: #f8fafc;
+}
+
+.species-details {
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  margin-top: 8px;
+  border: 1px solid #334155;
+}
+
+/* Loading Spinner */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #334155;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* FathomNet Data Styles */
+.fathomnet-data {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Taxonomy Information */
+.taxonomy-info {
+  margin-bottom: 20px;
+}
+
+.taxonomy-info h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.taxonomy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.taxonomy-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 6px 8px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 4px;
+  border: 1px solid #334155;
+}
+
+.taxonomy-item .label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.taxonomy-item .value {
+  color: #f8fafc;
+  font-style: italic;
+}
+
+/* Reference Images */
+.reference-images {
+  margin-bottom: 20px;
+}
+
+.reference-images h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.image-item {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.image-item img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-item:hover img {
+  transform: scale(1.05);
+}
+
+.image-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 8px 6px 4px;
+  font-size: 10px;
+}
+
+.image-info .depth {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.image-info .dataset {
+  color: #94a3b8;
+  margin-top: 2px;
+  display: block;
+}
+
+/* FathomNet Footer */
+.fathomnet-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: #64748b;
+  padding-top: 12px;
+  border-top: 1px solid #334155;
+}
+
+.source {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.timestamp {
+  font-family: monospace;
+}
+
+/* Species Badge in Alert */
+.species-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  font-size: 11px;
+  color: #93c5fd;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .alert-system.enhanced {
+    width: 95vw;
+    margin: 20px auto;
+  }
+  
+  .taxonomy-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .species-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+}

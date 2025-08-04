@@ -5,38 +5,40 @@
 // It initializes the dashboard, manages global state, and renders all major components.
 
 // Import React and necessary hooks for state management and lifecycle methods
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 // Import custom components for the dashboard
-import ConfigPanel from './components/ConfigPanel';
 import AlertFilterPanel from './components/AlertFilterPanel';
+import AuvCommandConsole from './components/AuvCommandConsole';
 import AuvMissionTimeline from './components/AuvMissionTimeline';
 import ComplianceRuleDrawer from './components/ComplianceRuleDrawer';
+import EnhancedAlertSystem from './components/EnhancedAlertSystem';
 import ExportCenter from './components/ExportCenter';
-import UserManagementPanel from './components/UserManagementPanel';
-import SystemHealthPanel from './components/SystemHealthPanel';
-import AuvCommandConsole from './components/AuvCommandConsole';
 import IsaRegulationReferencePanel from './components/IsaRegulationReferencePanel';
+import SpeciesDetectionPanel from './components/SpeciesDetectionPanel';
+import SystemHealthPanel from './components/SystemHealthPanel';
+import UserManagementPanel from './components/UserManagementPanel';
 
 // Import utility functions and services
+import fathomNetWS from './utils/fathomNetWebSocket';
 import webSocketService from './utils/webSocketService';
 
 // Import styles and libraries
-import './index.css';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
+} from 'chart.js';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js';
+import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
+import './index.css';
 
 // Register chart.js components for data visualization
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -73,6 +75,9 @@ function App() {
 
   // Modal state for export/settings/profile
   const [modal, setModal] = useState(null); // { type: 'telemetry'|'environmental'|'compliance'|'settings'|'profile', data: any }
+  
+  // Enhanced Alert System state
+  const [showEnhancedAlerts, setShowEnhancedAlerts] = useState(false);
 
   // --- Demo state for new dashboard features ---
   // Filtered alerts for AlertFilterPanel
@@ -151,6 +156,11 @@ function App() {
     const handleAlert = (alert) => {
       setAlerts(prev => [alert, ...prev.slice(0, 9)]); // Keep last 10 alerts
       addEvent(`Alert: ${alert.message}`, 'alert', alert);
+      
+      // Auto-show enhanced alert system for species alerts
+      if (alert.species) {
+        setShowEnhancedAlerts(true);
+      }
     };
 
     // Connect and subscribe to events
@@ -160,12 +170,16 @@ function App() {
     webSocketService.on('telemetry_update', handleTelemetry);
     webSocketService.on('alert', handleAlert);
 
+    // Set up FathomNet species alert handling
+    const unsubscribeSpeciesAlert = fathomNetWS.onSpeciesAlert(handleAlert);
+
     // Cleanup on unmount
     return () => {
       webSocketService.off('connect', handleConnect);
       webSocketService.off('disconnect', handleDisconnect);
       webSocketService.off('telemetry_update', handleTelemetry);
       webSocketService.off('alert', handleAlert);
+      unsubscribeSpeciesAlert();
       webSocketService.disconnect();
     };
     // eslint-disable-next-line
@@ -287,7 +301,7 @@ function App() {
             onSelect={setSelectedAUV}
           />
           <SystemStatus connectionStatus={connectionStatus} />
-          <AlertPanel alerts={alerts} />
+          <AlertPanel alerts={alerts} onShowDetails={() => setShowEnhancedAlerts(true)} />
         </div>
 
         {/* Center - Map & Visualization */}
@@ -308,6 +322,9 @@ function App() {
 
         {/* Right Sidebar - All Data and Demo Panels */}
         <div className="sidebar-right" style={{ maxWidth: 400 }}>
+          {/* FathomNet Species Detection Panel */}
+          <SpeciesDetectionPanel />
+          
           {/* New Functional Panels (Demo) */}
           <AlertFilterPanel alerts={alerts} onFilter={handleAlertFilter} />
           <AuvMissionTimeline missions={demoMissions} selectedAUV={selectedAUV} />
@@ -328,6 +345,17 @@ function App() {
       </div>
       {/* Compliance Rule Drawer (demo) */}
       <ComplianceRuleDrawer rule={selectedRule} open={drawerOpen} onClose={handleDrawerClose} />
+
+      {/* Enhanced Alert System with FathomNet Integration */}
+      {showEnhancedAlerts && (
+        <EnhancedAlertSystem
+          alerts={alerts}
+          onClose={() => setShowEnhancedAlerts(false)}
+          onDismiss={(alertId) => {
+            setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+          }}
+        />
+      )}
 
       {/* Dark Mode Toggle */}
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
@@ -645,11 +673,18 @@ function SystemStatus({ connectionStatus }) {
 }
 
 // Alert Panel Component
-function AlertPanel({ alerts }) {
+function AlertPanel({ alerts, onShowDetails }) {
   return (
     <div className="panel">
-      <div className="panel-header">
+      <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 className="panel-title">Recent Alerts</h3>
+        <button 
+          className="btn btn-sm" 
+          onClick={onShowDetails}
+          title="View detailed alerts"
+        >
+          🔍
+        </button>
       </div>
       <div className="panel-body">
         <div className="alert-list">
@@ -668,7 +703,14 @@ function AlertPanel({ alerts }) {
                     {alert.severity?.toUpperCase()}
                   </span>
                 </div>
-                <div className="alert-message">{alert.message}</div>
+                <div className="alert-message">
+                  {alert.message}
+                  {alert.species && (
+                    <div className="species-badge">
+                      🐙 {alert.species}
+                    </div>
+                  )}
+                </div>
               </div>
             ))
           )}
