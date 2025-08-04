@@ -1,0 +1,317 @@
+.mission-selector {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Header */
+.selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #334155;
+    gap: 96px;
+}
+
+.selector-header h3 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.btn-secondary {
+    background: #475569;
+    color: #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #64748b;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+}
+
+/* Error Message */
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-error {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-error:hover {
+    color: #dc2626;
+}
+
+/* Create Mission Form */
+.create-mission-form {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.create-mission-form h4 {
+    margin: 0 0 15px 0;
+    color: #f8fafc;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.auv-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Mission List */
+.mission-list h4 {
+    margin: 0 0 15px 0;
+    color: #f8fafc;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.no-missions {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+}
+
+.no-missions p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.missions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.mission-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.mission-card:hover {
+    background: #334155;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.mission-card.selected {
+    background: #1e40af;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.mission-info {
+    flex: 1;
+}
+
+.mission-info h5 {
+    margin: 0 0 8px 0;
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.mission-id {
+    margin: 0 0 8px 0;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-family: "Monaco", "Menlo", monospace;
+}
+
+.mission-stats {
+    margin: 0 0 8px 0;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+}
+
+.mission-time {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+.mission-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 1.125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .selector-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .missions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .mission-card {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .mission-actions {
+        align-self: flex-end;
+    }
+}

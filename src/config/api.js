@@ -3,107 +3,103 @@
  * Centralized configuration for all API endpoints and settings
  */
 
-export const API_CONFIG = {
-  baseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
-  wsUrl: import.meta.env.VITE_WS_BASE_URL || "ws://localhost:3000",
-  fathomnet: {
-    species: "/fathomnet/species",
-    search: "/fathomnet/search",
-    alert: "/fathomnet/alert",
-    cache: "/fathomnet/cache",
-  },
-  defaults: {
+// API Configuration for DeepSeaGuard
+// Centralized configuration for API endpoints and base URLs
+
+// Backend API base URL
+export const API_BASE_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+// FathomNet API endpoints
+export const FATHOMNET_ENDPOINTS = {
+    searchSpecies: (query, limit = 10) =>
+        `https://fathomnet.org/api/species/search?q=${encodeURIComponent(
+            query
+        )}&limit=${limit}`,
+    getSpecies: (speciesName, limit = 5) =>
+        `https://fathomnet.org/api/species/${encodeURIComponent(
+            speciesName
+        )}?limit=${limit}`,
+    getImages: (speciesName, limit = 10) =>
+        `https://fathomnet.org/api/images/search?q=${encodeURIComponent(
+            speciesName
+        )}&limit=${limit}`,
+};
+
+// Backend API endpoints
+export const BACKEND_ENDPOINTS = {
+    missions: `${API_BASE_URL}/api/missions`,
+    missionById: (id) => `${API_BASE_URL}/api/missions/${id}`,
+    missionExport: (id) => `${API_BASE_URL}/api/missions/${id}/export`,
+    missionIngest: `${API_BASE_URL}/api/missions/ingest`,
+    health: `${API_BASE_URL}/api/health`,
+    fathomnet: `${API_BASE_URL}/api/fathomnet`,
+};
+
+// API request helper with error handling
+export const apiRequest = async (url, options = {}) => {
+    try {
+        const response = await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                ...options.headers,
+            },
+            ...options,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("API request failed:", error);
+        throw error;
+    }
+};
+
+// Axios configuration with base URL
+import axios from "axios";
+
+// Create axios instance with base URL
+const apiClient = axios.create({
+    baseURL: API_BASE_URL,
     timeout: 10000,
     headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
+        "Content-Type": "application/json",
     },
-  },
-  retry: {
-    attempts: 3,
-    delay: 1000,
-    backoff: 2,
-  },
-};
+});
 
-export const buildApiUrl = (endpoint) => {
-  return `${API_CONFIG.baseUrl}${endpoint}`;
-};
-
-/**
- * FathomNet API endpoints
- */
-export const FATHOMNET_ENDPOINTS = {
-  getSpecies: (species, limit = 3) =>
-    buildApiUrl(
-      `${API_CONFIG.fathomnet.species}/${encodeURIComponent(
-        species
-      )}?limit=${limit}`
-    ),
-
-  searchSpecies: (query, limit = 10) =>
-    buildApiUrl(
-      `${API_CONFIG.fathomnet.search}?q=${encodeURIComponent(
-        query
-      )}&limit=${limit}`
-    ),
-
-  triggerAlert: () => buildApiUrl(API_CONFIG.fathomnet.alert),
-
-  getCacheStats: () => buildApiUrl(`${API_CONFIG.fathomnet.cache}/stats`),
-
-  clearCache: () => buildApiUrl(API_CONFIG.fathomnet.cache),
-};
-
-/**
- * Generic API request with error handling and retries
- * @param {string} url - Request URL
- * @param {object} options - Fetch options
- * @returns {Promise} - API response
- */
-export const apiRequest = async (url, options = {}) => {
-  const config = {
-    ...API_CONFIG.defaults,
-    ...options,
-    headers: {
-      ...API_CONFIG.defaults.headers,
-      ...options.headers,
+// Request interceptor for logging
+apiClient.interceptors.request.use(
+    (config) => {
+        console.log(
+            `🌐 API Request: ${config.method?.toUpperCase()} ${config.url}`
+        );
+        return config;
     },
-  };
-
-  let lastError;
-
-  for (let attempt = 1; attempt <= API_CONFIG.retry.attempts; attempt++) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), config.timeout);
-
-      const response = await fetch(url, {
-        ...config,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      lastError = error;
-      console.warn(`API request attempt ${attempt} failed:`, error.message);
-
-      if (attempt < API_CONFIG.retry.attempts) {
-        const delay =
-          API_CONFIG.retry.delay *
-          Math.pow(API_CONFIG.retry.backoff, attempt - 1);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
+    (error) => {
+        console.error("❌ API Request Error:", error);
+        return Promise.reject(error);
     }
-  }
+);
 
-  throw lastError;
-};
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+    (response) => {
+        console.log(
+            `✅ API Response: ${response.status} ${response.config.url}`
+        );
+        return response;
+    },
+    (error) => {
+        console.error(
+            "❌ API Response Error:",
+            error.response?.status,
+            error.response?.data
+        );
+        return Promise.reject(error);
+    }
+);
 
-export default API_CONFIG;
+export { apiClient };
