@@ -47,6 +47,7 @@ import {
     TileLayer,
 } from "react-leaflet";
 import "./index.css";
+import AlertFeed from "./components/AlertFeed";
 
 // Register chart.js components for data visualization
 ChartJS.register(
@@ -94,6 +95,8 @@ function App() {
 
     // Enhanced Alert System state
     const [showEnhancedAlerts, setShowEnhancedAlerts] = useState(false);
+
+    const [displayAlertFeed, setDisplayAlertFeed] = useState(false)
 
     // --- Demo state for new dashboard features ---
     // Filtered alerts for AlertFilterPanel
@@ -405,7 +408,7 @@ function App() {
 
                     {/* Dashboard Header with Mission Playback Button */}
                     <div className="dashboard-header">
-                        <h1>DeepSeaGuard Dashboard</h1>
+                        <h1>DeepSeaGuard Dashboard</h1> <span style={{ cursor: "pointer" }} onClick={() => setDisplayAlertFeed(true)}>Test alert feed</span>
                         <button
                             className="btn btn-primary"
                             onClick={() => setShowMissionPlayback(true)}>
@@ -433,12 +436,12 @@ function App() {
 
                         {/* Center - Map & Visualization */}
                         <div className="main-display">
-                            <MapDisplay
+                            {displayAlertFeed ? <AlertFeed /> : <MapDisplay
                                 auvData={auvData}
                                 selectedAUV={selectedAUV}
                                 onAUVSelect={setSelectedAUV}
                                 telemetryHistory={telemetryHistory}
-                            />
+                            />}
                             <TimeControls
                                 timeFrame={timeFrame}
                                 onTimeFrameChange={setTimeFrame}
