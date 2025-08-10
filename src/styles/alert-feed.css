@@ -1,0 +1,104 @@
+.alert-feed {
+    background-color: var(--ds-dark-panel, #0f172a);
+    color: var(--ds-text-primary, #e2e8f0);
+    border: 1px solid var(--ds-border-color, #1e293b);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: "Inter", sans-serif;
+    height: 800px !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+
+.alert-feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.alert-feed-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mark-read-btn {
+    background: transparent;
+    border: 1px solid var(--ds-border-color, #334155);
+    color: var(--ds-text-secondary, #94a3b8);
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.mark-read-btn:hover {
+    background-color: var(--ds-hover-bg, #1e293b);
+}
+
+.alert-item {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--ds-border-color, #334155);
+}
+
+.alert-item.unread {
+    border-left: 3px solid var(--ds-accent, #38bdf8);
+}
+
+.alert-item.read {
+    opacity: 0.6;
+}
+
+.severity-high {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-left-color: #ef4444;
+}
+
+.severity-medium {
+    background-color: rgba(251, 191, 36, 0.1);
+    border-left-color: #fbbf24;
+}
+
+.severity-low {
+    background-color: rgba(34, 197, 94, 0.1);
+    border-left-color: #22c55e;
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.alert-title {
+    font-weight: 500;
+}
+
+.alert-time {
+    color: var(--ds-text-secondary, #94a3b8);
+}
+
+.alert-message {
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.no-alerts {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ds-text-secondary, #94a3b8);
+    padding: 16px 0;
+}
