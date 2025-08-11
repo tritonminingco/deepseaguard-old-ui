@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FATHOMNET_ENDPOINTS, apiRequest } from '../config/api';
+import { useAlerts } from '../hooks/useAlerts.js';
 import '../styles/AlertSystem.css';
 import '../styles/FathomNetIntegration.css';
 
@@ -10,7 +11,9 @@ import '../styles/FathomNetIntegration.css';
  * species reference images and taxonomy data from FathomNet when
  * species detection alerts are triggered.
  */
-function EnhancedAlertSystem({ alerts, onClose, onDismiss }) {
+function EnhancedAlertSystem({ onClose }) {
+  const { alerts, acknowledgeAlert, resolveAlert, deleteAlert } = useAlerts();
+  
   const [speciesData, setSpeciesData] = useState({});
   const [loadingSpecies, setLoadingSpecies] = useState({});
   const [expandedAlerts, setExpandedAlerts] = useState(new Set());
@@ -64,15 +67,15 @@ function EnhancedAlertSystem({ alerts, onClose, onDismiss }) {
   };
 
   const getSeverityIcon = (severity) => {
-    const icons = { 
-      critical: '🚨', 
-      warning: '⚠️', 
-      info: '🔵', 
-      high: '🚨', 
-      medium: '⚠️', 
-      low: 'ℹ️' 
+    const textLabels = { 
+      critical: 'CRITICAL', 
+      warning: 'WARNING', 
+      info: 'INFO', 
+      high: 'HIGH', 
+      medium: 'MEDIUM', 
+      low: 'LOW' 
     };
-    return icons[severity] || '❓';
+    return textLabels[severity] || 'INFO';
   };
 
   const formatTimeAgo = (timestamp) => {
@@ -98,12 +101,12 @@ function EnhancedAlertSystem({ alerts, onClose, onDismiss }) {
       <div className="species-info">
         <div className="species-header" onClick={() => toggleAlertExpansion(alert.id)}>
           <div className="species-title">
-            <span className="species-icon">🐙</span>
+            <span className="species-icon">Species:</span>
             <span className="species-name">{species}</span>
             {alert.distance && <span className="distance">~{alert.distance}m</span>}
           </div>
           <button className="expand-btn">
-            {isExpanded ? '▼' : '▶'}
+            {isExpanded ? 'COLLAPSE' : 'EXPAND'}
           </button>
         </div>
 
@@ -120,7 +123,7 @@ function EnhancedAlertSystem({ alerts, onClose, onDismiss }) {
               <div className="fathomnet-data">
                 {data.error ? (
                   <div className="error-message">
-                    <span>⚠️ {data.error}</span>
+                    <span>ERROR: {data.error}</span>
                   </div>
                 ) : (
                   <>
@@ -196,22 +199,22 @@ function EnhancedAlertSystem({ alerts, onClose, onDismiss }) {
   };
 
   return (
-    <div className="alert-system-overlay">
-      <div className="alert-system enhanced">
-        <div className="alert-header">
+    <div className="enhanced-alert-system-overlay">
+      <div className="enhanced-alert-system">
+        <div className="enhanced-alert-header">
           <h2>System Alerts</h2>
           <div className="alert-summary">
             <span className="total-count">{alerts.length} alerts</span>
           </div>
           <button className="close-button" onClick={onClose}>
-            ×
+            CLOSE
           </button>
         </div>
 
-        <div className="alert-list">
+        <div className="alert-list enhanced">
           {alerts.length === 0 ? (
             <div className="no-alerts">
-              <div className="no-alerts-icon">✅</div>
+              <div className="no-alerts-icon">OK</div>
               <h3>No active alerts</h3>
               <p>System monitoring is active.</p>
             </div>
@@ -235,23 +238,33 @@ function EnhancedAlertSystem({ alerts, onClose, onDismiss }) {
                   </div>
                   <div className="alert-actions">
                     <button
-                      className="dismiss-button"
-                      onClick={() => onDismiss(alert.id)}
-                      title="Dismiss alert"
+                      className="acknowledge-button"
+                      onClick={() => acknowledgeAlert(alert.id)}
+                      title="Acknowledge alert"
+                      disabled={alert.acknowledged}
                     >
-                      ✓
+                      {alert.acknowledged ? 'DONE' : 'ACK'}
+                    </button>
+                    <button
+                      className="resolve-button"
+                      onClick={() => resolveAlert(alert.id, 'Resolved by user')}
+                      title="Resolve alert"
+                      disabled={alert.resolved}
+                    >
+                      {alert.resolved ? 'RESOLVED' : 'RESOLVE'}
+                    </button>
+                    <button
+                      className="delete-button"
+                      onClick={() => deleteAlert(alert.id)}
+                      title="Delete alert"
+                    >
+                      DELETE
                     </button>
                   </div>
                 </div>
               </div>
             ))
           )}
-        </div>
-
-        <div className="alert-footer">
-          <button className="btn btn-primary" onClick={onClose}>
-            Close
-          </button>
         </div>
       </div>
     </div>

@@ -1,128 +1,119 @@
-import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import "../styles/alert-feed.css"
+import { useEffect } from "react";
+import { useAlerts, useBulkAlertOperations } from '../hooks/useAlerts.js';
+import "../styles/alert-feed.css";
 
-const severities = ["high", "medium", "low"];
-const alertTitles = [
-  "System Overload",
-  "AUV Battery Low",
-  "Telemetry Loss",
-  "Compliance Breach",
-  "Navigation Drift",
-  "Hull Breach Detected",
-  "Sonar Obstruction",
-  "Thruster Malfunction",
-  "Temperature Spike",
-  "Pressure Anomaly",
-  "GPS Signal Lost",
-  "Data Corruption Detected",
-  "Unauthorized Access Attempt",
-  "Communication Latency High",
-  "Mission Timer Expired",
-];
+const AlertFeed = () => {
+  // Use Redux hooks for alerts state
+  const { 
+    alerts, 
+    loading, 
+    error, 
+    fetchAlerts, 
+    markAsRead,
+    createAlert 
+  } = useAlerts();
+  
+  const { markAllAsRead } = useBulkAlertOperations();
 
-const alertInfo = [
-  "Immediate operator intervention required.",
-  "Battery levels are critically low.",
-  "Data stream has been interrupted.",
-  "Detected unauthorized operation in protected zone.",
-  "Deviation from planned route detected.",
-  "Structural integrity compromised — investigate immediately.",
-  "Sonar path is blocked — navigation accuracy may be reduced.",
-  "One or more thrusters are offline — performance degraded.",
-  "Internal temperature exceeding safe operational limits.",
-  "Detected abnormal pressure fluctuations in main compartment.",
-  "GPS tracking unavailable — switching to dead reckoning.",
-  "Critical telemetry data corrupted — mission data at risk.",
-  "Failed login attempt detected — possible security breach.",
-  "High delay in communication — real-time control affected.",
-  "Mission duration exceeded planned operational window.",
-];
+  // Load alerts on component mount
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
 
-
-function getRandomItem(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-const AlertFeed = ({ alerts: initialAlerts }) => {
-  const [alerts, setAlerts] = useState(initialAlerts || []);
-
+  // Simulate periodic new alerts (for demo purposes)
   useEffect(() => {
     const interval = setInterval(() => {
-      const newAlert = {
-        id: Date.now().toString(),
-        title: getRandomItem(alertTitles),
-        message: getRandomItem(alertInfo),
-        timestamp: new Date().toISOString(),
-        severity: getRandomItem(severities),
-        type: "system",
-        read: false,
-      };
-      setAlerts((prev) => [newAlert, ...prev]);
-    }, 5000);
+      // Randomly create new alerts (30% chance every 10 seconds)
+      if (Math.random() > 0.7) {
+        const alertTypes = ['environmental', 'operational', 'compliance', 'system'];
+        const severities = ['high', 'medium', 'low'];
+        const type = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+        const severity = severities[Math.floor(Math.random() * severities.length)];
+        
+        createAlert({
+          type,
+          severity,
+          title: `New ${type} alert`,
+          message: `Simulated ${severity} severity ${type} alert`,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }, 10000); // Every 10 seconds
 
     return () => clearInterval(interval);
-  }, []);
-
-  const markAllAsRead = () => {
-    setAlerts((prev) => prev.map((a) => ({ ...a, read: true })));
-  };
+  }, [createAlert]);
 
   const formatTime = (iso) => {
     const date = new Date(iso);
     return date.toLocaleString();
   };
 
+  const handleAlertClick = (alert) => {
+    if (!alert.read) {
+      markAsRead(alert.id);
+    }
+  };
+
   return (
     <div className="alert-feed">
       <div className="alert-feed-header">
         <h3>Recent Alerts</h3>
-        {alerts.length > 0 && (
-          <button className="mark-read-btn" onClick={markAllAsRead}>
-            Mark all as read
-          </button>
-        )}
+        <div className="alert-feed-controls">
+          {alerts.length > 0 && (
+            <button className="mark-read-btn" onClick={markAllAsRead}>
+              Mark all as read
+            </button>
+          )}
+          {loading.fetch && <span className="loading">Loading...</span>}
+        </div>
       </div>
+      
+      {error && (
+        <div className="alert-error">
+          Error loading alerts: {error}
+        </div>
+      )}
+      
       <div className="alert-content">
-        {alerts.length === 0 ? (
+        {alerts.length === 0 && !loading.fetch ? (
           <div className="no-alerts">No active alerts</div>
         ) : (
-          alerts
+          [...alerts] // Create a copy before sorting
             .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+            .slice(0, 20) // Show only the latest 20 alerts
             .map((alert) => (
               <div
                 key={alert.id}
-                className={`alert-item severity-${alert.severity} ${
+                className={`alert-item type-${alert.type} severity-${alert.severity} ${
                   alert.read ? "read" : "unread"
+                } ${alert.acknowledged ? "acknowledged" : ""} ${
+                  alert.resolved ? "resolved" : ""
                 }`}
+                onClick={() => handleAlertClick(alert)}
+                role="button"
+                tabIndex={0}
               >
-                <div className="alert-header">
-                  <span className="alert-title">{alert.title}</span>
-                  <span className="alert-time">
-                    {formatTime(alert.timestamp)}
-                  </span>
-                </div>
+                <div className="alert-title">{alert.title}</div>
                 <div className="alert-message">{alert.message}</div>
+                <div className="alert-time">
+                  {formatTime(alert.timestamp)}
+                </div>
+                <div className="alert-meta">
+                  <span className={`alert-type type-${alert.type}`}>{alert.type}</span>
+                  <span className="alert-source">{alert.source}</span>
+                  {alert.acknowledged && (
+                    <span className="alert-status acknowledged">ACK</span>
+                  )}
+                  {alert.resolved && (
+                    <span className="alert-status resolved">RESOLVED</span>
+                  )}
+                </div>
               </div>
             ))
         )}
       </div>
     </div>
   );
-};
-
-AlertFeed.propTypes = {
-  alerts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-      timestamp: PropTypes.string.isRequired,
-      severity: PropTypes.oneOf(["high", "medium", "low"]).isRequired,
-      type: PropTypes.string.isRequired,
-      read: PropTypes.bool,
-    }),
-  ),
 };
 
 export default AlertFeed;
