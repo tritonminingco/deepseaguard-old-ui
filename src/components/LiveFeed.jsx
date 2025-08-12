@@ -1,21 +1,23 @@
 import {useEffect, useState, useRef} from 'react';
 import Hls from 'hls.js';
-import "../styles/LiveFeed.css"; 
 import { ClipLoader } from "react-spinners";
 import { FaCamera } from 'react-icons/fa';
 import { Dropdown } from 'primereact/dropdown';
-import SquareButton from './SquareButton';
-import { FaPause } from 'react-icons/fa';
+import { FaPlay, FaPause } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
-import { FaVolumeUp } from 'react-icons/fa';
+import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { MdFullscreen } from 'react-icons/md';
+import SquareButton from './SquareButton';
+import "../styles/LiveFeed.css"; 
+
 export default function LiveFeed({ streamUrl}) {
     const videoRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isOffline, setIsOffline] = useState(false);
-    const [isFullscreen, setIsFullscreen] = useState(false);
     const [timestamp, setTimestamp] = useState(new Date());
     const [selectedCity, setSelectedCity] = useState("Main Camera");
+    const [isPaused, setIsPaused] = useState(false);
+    const [isMuted, setIsMuted] = useState(true);
 
     useEffect(() => {
         const timer = setInterval(() => setTimestamp(new Date()), 1000);
@@ -44,17 +46,41 @@ export default function LiveFeed({ streamUrl}) {
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
             videoRef.current.requestFullscreen();
-            setIsFullscreen(true);
         } else {
             document.exitFullscreen();
-            setIsFullscreen(false);
         }
     };
+
+    const handlePausePlay = () => {
+        const video = videoRef.current;
+        if (video.paused) {
+            video.play();
+            setIsPaused(false);
+        } else {
+            video.pause();
+            setIsPaused(true);
+        }
+    };
+
+    const handleRestart = () => {
+        const video = videoRef.current;
+        video.currentTime = 0;
+        video.play();
+        setIsPaused(false);
+    };
+
+    const handleMuteUnmute = () => {
+        const video = videoRef.current;
+        video.muted = !video.muted;
+        setIsMuted(video.muted);
+    };
+
     const cities = [
         { name: 'Main Camera', code: 'MC' },
         { name: 'Secondary Camera', code: 'SC' },
         { name: 'Backup Camera', code: 'BC' }
     ];
+
     return (
         <div className='mx-8'>
             <div className='bg-gray-900 round-lg shadow-lg p-3 relative overflow-hidden border'>
@@ -75,21 +101,9 @@ export default function LiveFeed({ streamUrl}) {
                         </div>
                     </div>
                     <div className='flex padding-buttons'>
-                        <SquareButton label={<FaPause/>} onClick={() => {
-                            setIsLoading(true);
-                            setIsOffline(false);
-                            videoRef.current.load();
-                        }} />
-                        <SquareButton label={<FiRefreshCw/>} onClick={() => {
-                            setIsLoading(true);
-                            setIsOffline(false);
-                            videoRef.current.load();
-                        }} />
-                        <SquareButton label={<FaVolumeUp/>} onClick={() => {
-                            setIsLoading(true);
-                            setIsOffline(false);
-                            videoRef.current.load();
-                        }} />
+                        <SquareButton label={isPaused ? <FaPlay /> : <FaPause />} onClick={handlePausePlay} />
+                        <SquareButton label={<FiRefreshCw/>} onClick={handleRestart} />
+                        <SquareButton label={isMuted ? <FaVolumeUp /> : <FaVolumeMute />} onClick={handleMuteUnmute} />
                         <SquareButton label={<MdFullscreen/>} onClick={toggleFullscreen} />
                     </div>                                        
                 </div>
@@ -137,5 +151,4 @@ export default function LiveFeed({ streamUrl}) {
             </div>
         </div>
     )
-
 }
