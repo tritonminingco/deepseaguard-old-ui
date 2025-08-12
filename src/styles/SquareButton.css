@@ -1,0 +1,13 @@
+    /* SquareButton.css */
+    .square-button {
+      width: 40px; /* Or any desired fixed width */
+      height: 40px; /* Same as width for a perfect square */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #334155;
+      color: white;
+      border-radius: 20%;
+      margin-left: 0.25rem;
+      /* Add other styling like border, background, font, etc. */
+    }
