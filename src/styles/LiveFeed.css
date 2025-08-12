@@ -1,0 +1,152 @@
+@keyframes offlinePulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+@keyframes offlineBlink {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0.3;
+  }
+}
+
+.offline-pulse {
+  animation: offlinePulse 1.5s ease-in-out infinite;
+}
+
+.offline-dot {
+  width: 12px;
+  height: 12px;
+  background-color: red;
+  border-radius: 50%;
+  animation: offlineBlink 1s infinite;
+}
+
+.mx-8 {
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+.bg-gray-900 {
+  background-color: #1e293b
+}
+
+.padding-video {
+  /* padding-top: 7.25%; 16:9 aspect ratio */
+  padding-left: 5%;
+  padding-bottom: 5%;
+  padding-right: 5%;
+}
+
+.padding-h3 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 5%;
+}
+
+.flex {
+  display: flex;
+  align-items: center;;
+}
+
+.text-red {
+  color: red;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.live-status {
+  list-style-type: disc; 
+  display: list-item; 
+  margin-left: 2rem;
+  color: red;
+  margin-right: 1rem;
+}
+
+.live-status::marker {
+  margin-right: 0.5rem;
+}
+
+.w-fits {
+  width: fit-content;
+  background-color: #1e293b;
+  padding: 0.5rem 1rem;
+}
+
+.p-dropdown-items {
+  background-color: #334155;
+  padding: 0.5rem 1rem;
+}
+
+.justify-between{
+  justify-content: space-between;
+}
+
+.padding-buttons {
+  padding-right: 5%;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.top-4 {
+  top: 1rem;
+}
+
+.right-4 {
+  right: 5rem;
+}
+
+.left-4 {
+  left: 5rem;
+}
+
+.space-y-1 {
+  margin-top: 1rem;
+}
+
+.relative {
+  position: relative;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+}
+
+.bg-black-60 {
+  background-color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 0.1rem;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.rounded-lg {
+  border-radius: 12px;
+}
+
+.rounded-sm {
+  border-radius: 4px;
+}
+
+.border {
+  border: 1px solid #334155;
+}

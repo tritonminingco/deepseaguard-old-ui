@@ -20,6 +20,7 @@ import MissionSelector from "./components/MissionSelector";
 import SpeciesDetectionPanel from "./components/SpeciesDetectionPanel";
 import SystemHealthPanel from "./components/SystemHealthPanel";
 import UserManagementPanel from "./components/UserManagementPanel";
+import LiveFeed from "./components/LiveFeed";
 
 // Import utility functions and services
 import fathomNetWS from "./utils/fathomNetWebSocket";
@@ -1089,48 +1090,49 @@ function MapDisplay({ auvData, selectedAUV, onAUVSelect, telemetryHistory }) {
     );
 
     return (
-        <div className="map-container">
-            <div className="map-header">
-                <h3 className="panel-title">
-                    Clarion-Clipperton Zone - Live Operations
-                </h3>
-                <div className="map-controls">
-                    <button
-                        className="btn btn-primary"
-                        title="Layer controls (future)">
-                        LAYERS
-                    </button>
-                    <button className="btn" title="Zoom to fit (future)">
-                        ZOOM FIT
-                    </button>
-                    <button className="btn" title="Export map (future)">
-                        EXPORT
-                    </button>
-                </div>
-            </div>
-            <div
-                className="map-display"
-                style={{
-                    height: 320,
-                    width: "100%",
-                    borderRadius: 12,
-                    overflow: "hidden",
-                    margin: "0 auto",
-                }}>
-                <MapContainer
-                    center={selectedPos}
-                    zoom={6}
-                    scrollWheelZoom={true}
-                    style={{ height: "100%", width: "100%" }}>
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {tracks}
-                    {auvMarkers}
-                </MapContainer>
-            </div>
-        </div>
+        <LiveFeed streamUrl={"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"}/>
+        // <div className="map-container">
+        //     <div className="map-header">
+        //         <h3 className="panel-title">
+        //             Clarion-Clipperton Zone - Live Operations
+        //         </h3>
+        //         <div className="map-controls">
+        //             <button
+        //                 className="btn btn-primary"
+        //                 title="Layer controls (future)">
+        //                 LAYERS
+        //             </button>
+        //             <button className="btn" title="Zoom to fit (future)">
+        //                 ZOOM FIT
+        //             </button>
+        //             <button className="btn" title="Export map (future)">
+        //                 EXPORT
+        //             </button>
+        //         </div>
+        //     </div>
+        //     <div
+        //         className="map-display"
+        //         style={{
+        //             height: 320,
+        //             width: "100%",
+        //             borderRadius: 12,
+        //             overflow: "hidden",
+        //             margin: "0 auto",
+        //         }}>
+        //         <MapContainer
+        //             center={selectedPos}
+        //             zoom={6}
+        //             scrollWheelZoom={true}
+        //             style={{ height: "100%", width: "100%" }}>
+        //             <TileLayer
+        //                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        //                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        //             />
+        //             {tracks}
+        //             {auvMarkers}
+        //         </MapContainer>
+        //     </div>
+        // </div>
     );
 }
 
