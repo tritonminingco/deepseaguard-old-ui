@@ -25,8 +25,7 @@ class InsightParams:
     type: Optional[str] = None
     limit: int = 20
     summary: bool = False  # backward compatibility; if true implies timeseries
-    summary_modes: Optional[List[str]] = [
-        "timeseries"]  # e.g. ["timeseries","stats"]
+    summary_modes: Optional[List[str]] = None  # e.g. ["timeseries","stats"]
     window_minutes: int = 20  # window for applicable summaries
     timeseries_limit: int = 30  # max telemetry points returned
     timeseries_fields: Optional[List[str]] = None  # subset of allowed fields
