@@ -38,3 +38,8 @@ This service ingests AUV telemetry, stores it in PostgreSQL+PostGIS, and generat
    alembic revision --autogenerate -m "description for schema change"
    alembic upgrade head
    ```
+
+**TODOs**
+- Due to droping duplicate alert logic we are lossing Environment Alerts with different type of threshold.
+- Add tests for insights service
+- Implement pagination for alerts
