@@ -7,6 +7,8 @@
 // Import React and necessary hooks for state management and lifecycle methods
 import { useEffect, useState } from "react";
 
+import { useAlerts, useAlertsSubscription } from "./hooks/useAlerts.js";
+
 // Import custom components for the dashboard
 import AlertFilterPanel from "./components/AlertFilterPanel";
 import AuvCommandConsole from "./components/AuvCommandConsole";
@@ -46,8 +48,9 @@ import {
     Popup,
     TileLayer,
 } from "react-leaflet";
-import "./index.css";
+
 import AlertFeed from "./components/AlertFeed";
+import "./index.css";
 
 // Register chart.js components for data visualization
 ChartJS.register(
@@ -76,8 +79,6 @@ function App() {
     const [timeFrame, setTimeFrame] = useState("live");
     // All AUV data keyed by AUV ID
     const [auvData, setAuvData] = useState({});
-    // List of recent alerts for the alert system
-    const [alerts, setAlerts] = useState([]);
     // Timestamp of last telemetry update
     const [lastUpdate, setLastUpdate] = useState(null);
     // Event log for system and user actions
@@ -96,11 +97,13 @@ function App() {
     // Enhanced Alert System state
     const [showEnhancedAlerts, setShowEnhancedAlerts] = useState(false);
 
-    const [displayAlertFeed, setDisplayAlertFeed] = useState(false)
+    // Redux alerts state and actions
+    const { alerts, unreadCount, createAlert } = useAlerts();
+    
+    // Auto-subscribe to real-time alerts
+    useAlertsSubscription(true);
 
     // --- Demo state for new dashboard features ---
-    // Filtered alerts for AlertFilterPanel
-    const [filteredAlerts, setFilteredAlerts] = useState([]);
     // Selected compliance rule for drawer
     const [selectedRule, setSelectedRule] = useState(null);
     // Drawer open/close state
@@ -201,9 +204,18 @@ function App() {
                 return { ...prev, [auvId]: filtered };
             });
         };
-        // On alert, update alerts and log event
+        // On alert, update alerts via Redux and log event
         const handleAlert = (alert) => {
-            setAlerts((prev) => [alert, ...prev.slice(0, 9)]); // Keep last 10 alerts
+            // Create alert in Redux store
+            createAlert({
+                type: alert.type || 'system',
+                severity: alert.severity || 'medium',
+                title: alert.title || 'System Alert',
+                message: alert.message,
+                source: alert.source || 'DeepSeaGuard System',
+                metadata: alert.metadata || {}
+            });
+            
             addEvent(`Alert: ${alert.message}`, "alert", alert);
 
             // Auto-show enhanced alert system for species alerts
@@ -239,17 +251,6 @@ function App() {
     const currentTelemetry = telemetryHistory[selectedAUV] || [];
 
     // --- Handlers for new dashboard features ---
-    // Filter alerts by search, severity, or AUV
-    const handleAlertFilter = ({ search, severity, auv }) => {
-        let result = alerts;
-        if (search)
-            result = result.filter((a) =>
-                a.message.toLowerCase().includes(search.toLowerCase())
-            );
-        if (severity) result = result.filter((a) => a.severity === severity);
-        if (auv) result = result.filter((a) => a.auv_id === auv);
-        setFilteredAlerts(result);
-    };
     // Switch active user in demo mode
     const handleUserSwitch = (user) => {
         setDemoUsers((users) =>
@@ -379,7 +380,7 @@ function App() {
                         <StatusBar
                             connectionStatus={connectionStatus}
                             lastUpdate={lastUpdate}
-                            alertCount={alerts.length}
+                            alertCount={unreadCount}
                         />
                         <div
                             style={{
@@ -408,7 +409,7 @@ function App() {
 
                     {/* Dashboard Header with Mission Playback Button */}
                     <div className="dashboard-header">
-                        <h1>DeepSeaGuard Dashboard</h1> <span style={{ cursor: "pointer" }} onClick={() => setDisplayAlertFeed(true)}>Test alert feed</span>
+                        <h1>DeepSeaGuard Dashboard</h1>
                         <button
                             className="btn btn-primary"
                             onClick={() => setShowMissionPlayback(true)}>
@@ -427,7 +428,6 @@ function App() {
                             />
                             <SystemStatus connectionStatus={connectionStatus} />
                             <AlertPanel
-                                alerts={alerts}
                                 onShowDetails={() =>
                                     setShowEnhancedAlerts(true)
                                 }
@@ -436,12 +436,12 @@ function App() {
 
                         {/* Center - Map & Visualization */}
                         <div className="main-display">
-                            {displayAlertFeed ? <AlertFeed /> : <MapDisplay
+                            <MapDisplay
                                 auvData={auvData}
                                 selectedAUV={selectedAUV}
                                 onAUVSelect={setSelectedAUV}
                                 telemetryHistory={telemetryHistory}
-                            />}
+                            />
                             <TimeControls
                                 timeFrame={timeFrame}
                                 onTimeFrameChange={setTimeFrame}
@@ -454,14 +454,14 @@ function App() {
                         <div
                             className="sidebar-right"
                             style={{ maxWidth: 400 }}>
+                            {/* Live Alert Feed */}
+                            <AlertFeed />
+                            
                             {/* FathomNet Species Detection Panel */}
                             <SpeciesDetectionPanel />
 
                             {/* New Functional Panels (Demo) */}
-                            <AlertFilterPanel
-                                alerts={alerts}
-                                onFilter={handleAlertFilter}
-                            />
+                            <AlertFilterPanel />
                             <AuvMissionTimeline
                                 missions={demoMissions}
                                 selectedAUV={selectedAUV}
@@ -526,13 +526,7 @@ function App() {
                     {/* Enhanced Alert System with FathomNet Integration */}
                     {showEnhancedAlerts && (
                         <EnhancedAlertSystem
-                            alerts={alerts}
                             onClose={() => setShowEnhancedAlerts(false)}
-                            onDismiss={(alertId) => {
-                                setAlerts((prev) =>
-                                    prev.filter((alert) => alert.id !== alertId)
-                                );
-                            }}
                         />
                     )}
 
@@ -950,53 +944,50 @@ function SystemStatus({ connectionStatus }) {
 }
 
 // Alert Panel Component
-function AlertPanel({ alerts, onShowDetails }) {
+function AlertPanel({ onShowDetails }) {
+    // Use Redux for alerts instead of props
+    const { alerts } = useAlerts();
+    
     return (
         <div className="panel">
-            <div
-                className="panel-header"
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                }}>
-                <h3 className="panel-title">Recent Alerts</h3>
+            <div className="alert-panel-header">
+                <h3 className="alert-panel-title">Recent Alerts ({alerts.length})</h3>
                 <button
-                    className="btn btn-sm"
+                    className="alert-panel-btn"
                     onClick={onShowDetails}
                     title="View detailed alerts">
                     🔍
                 </button>
             </div>
             <div className="panel-body">
-                <div className="alert-list">
+                <div className="alert-panel-list">
                     {alerts.length === 0 ? (
-                        <div className="no-alerts">
+                        <div className="alert-panel-no-alerts">
                             <span className="data-label">NO ACTIVE ALERTS</span>
                         </div>
                     ) : (
                         alerts.slice(0, 5).map((alert, index) => (
                             <div
-                                key={index}
-                                className={`alert-item alert-${
+                                key={alert.id || index}
+                                className={`alert-panel-item severity-${
                                     alert.severity || "info"
                                 }`}>
-                                <div className="alert-header">
-                                    <span className="alert-time">
+                                <div className="alert-panel-item-header">
+                                    <span className="alert-panel-time">
                                         {new Date(
                                             alert.timestamp
                                         ).toLocaleTimeString()}
                                     </span>
                                     <span
-                                        className={`alert-severity severity-${alert.severity}`}>
+                                        className={`alert-panel-severity severity-${alert.severity}`}>
                                         {alert.severity?.toUpperCase()}
                                     </span>
                                 </div>
-                                <div className="alert-message">
+                                <div className="alert-panel-message">
                                     {alert.message}
                                     {alert.species && (
-                                        <div className="species-badge">
-                                            🐙 {alert.species}
+                                        <div className="alert-panel-species-badge">
+                                            Species: {alert.species}
                                         </div>
                                     )}
                                 </div>

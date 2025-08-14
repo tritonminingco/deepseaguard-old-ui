@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { useEffect, useMemo } from 'react';
+import { useAlertFilters, useAlerts } from '../hooks/useAlerts.js';
 import '../styles/AlertSystem.css';
 
 /**
@@ -9,53 +10,45 @@ import '../styles/AlertSystem.css';
  * It provides functionalities to filter, sort, and dismiss alerts.
  * 
  * Props:
- * - alerts: Array of alert objects containing id, title, message, severity, and timestamp.
  * - onClose: Function to close the alert system modal.
- * - onDismiss: Function to dismiss individual alerts.
  */
-function AlertSystem({ alerts, onClose, onDismiss }) {
-  const [severityFilter, setSeverityFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('time');
+function AlertSystem({ onClose }) {
+  const { 
+    filteredAlerts, 
+    loading, 
+    error, 
+    acknowledgeAlert, 
+    resolveAlert, 
+    markAsRead,
+    deleteAlert,
+    fetchAlerts 
+  } = useAlerts();
+  
+  const { 
+    filters, 
+    setSeverityFilter, 
+    setSortBy 
+  } = useAlertFilters();
 
-  // Memoize filtered and sorted alerts to avoid unnecessary re-computations
-  const filteredAlerts = useMemo(() => {
-    let filtered = [...alerts];
-
-    if (severityFilter !== 'all') {
-      filtered = filtered.filter(alert => alert.severity === severityFilter);
-    }
-
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'time':
-          return new Date(b.timestamp) - new Date(a.timestamp);
-        case 'severity':
-          const severityOrder = { high: 3, medium: 2, low: 1 };
-          return severityOrder[b.severity] - severityOrder[a.severity];
-        case 'title':
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [alerts, severityFilter, sortBy]);
+  // Load alerts on component mount
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
 
   // Memoize severity counts for performance
   const severityCounts = useMemo(() => {
-    return alerts.reduce(
+    return filteredAlerts.reduce(
       (counts, alert) => {
         counts[alert.severity] = (counts[alert.severity] || 0) + 1;
         return counts;
       },
       { high: 0, medium: 0, low: 0 }
     );
-  }, [alerts]);
+  }, [filteredAlerts]);
 
   const getSeverityIcon = (severity) => {
-    const icons = { high: '🚨', medium: '⚠️', low: 'ℹ️' };
-    return icons[severity] || '❓';
+    const textLabels = { high: 'HIGH', medium: 'MED', low: 'LOW' };
+    return textLabels[severity] || 'INFO';
   };
 
   const getSeverityColor = (severity) => {
@@ -83,21 +76,16 @@ function AlertSystem({ alerts, onClose, onDismiss }) {
 
   return (
     <div className="alert-system-overlay" role="dialog" aria-labelledby="alert-system-title">
-      <div className="alert-system">
+      <div className="alert-system alert-system-bottom">
         <div className="alert-header">
           <div className="header-left">
             <h2 id="alert-system-title">System Alerts</h2>
             <div className="alert-summary">
-              <span className="total-count">{alerts.length} total</span>
-              <div className="severity-counts">
-                <span className="count high">{severityCounts.high} high</span>
-                <span className="count medium">{severityCounts.medium} medium</span>
-                <span className="count low">{severityCounts.low} low</span>
-              </div>
+              <span className="total-count">{filteredAlerts.length} alerts</span>
             </div>
           </div>
           <button className="close-button" onClick={onClose} aria-label="Close alert system">
-            <span>×</span>
+            <span>CLOSE</span>
           </button>
         </div>
 
@@ -107,7 +95,7 @@ function AlertSystem({ alerts, onClose, onDismiss }) {
               <label htmlFor="severity-filter">Filter by severity:</label>
               <select
                 id="severity-filter"
-                value={severityFilter}
+                value={filters.severity}
                 onChange={(e) => setSeverityFilter(e.target.value)}
               >
                 <option value="all">All Severities</option>
@@ -121,7 +109,7 @@ function AlertSystem({ alerts, onClose, onDismiss }) {
               <label htmlFor="sort-by">Sort by:</label>
               <select
                 id="sort-by"
-                value={sortBy}
+                value={filters.sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
                 <option value="time">Most Recent</option>
@@ -167,11 +155,27 @@ function AlertSystem({ alerts, onClose, onDismiss }) {
                   </div>
                   <div className="alert-actions">
                     <button
-                      className="dismiss-button"
-                      onClick={() => onDismiss(alert.id)}
-                      title="Dismiss alert"
+                      className="acknowledge-button"
+                      onClick={() => acknowledgeAlert(alert.id)}
+                      title="Acknowledge alert"
+                      disabled={alert.acknowledged}
                     >
-                      ✓
+                      {alert.acknowledged ? '✓' : 'ACK'}
+                    </button>
+                    <button
+                      className="resolve-button"
+                      onClick={() => resolveAlert(alert.id, 'Resolved by user')}
+                      title="Resolve alert"
+                      disabled={alert.resolved}
+                    >
+                      {alert.resolved ? 'RESOLVED' : 'RESOLVE'}
+                    </button>
+                    <button
+                      className="delete-button"
+                      onClick={() => deleteAlert(alert.id)}
+                      title="Delete alert"
+                    >
+                      🗑️
                     </button>
                   </div>
                 </div>
@@ -182,16 +186,11 @@ function AlertSystem({ alerts, onClose, onDismiss }) {
 
         <div className="alert-footer">
           <div className="footer-info">
-            <span>Showing {filteredAlerts.length} of {alerts.length} alerts</span>
+            <span>Showing {filteredAlerts.length} alerts</span>
+            {loading.fetch && <span> (Loading...)</span>}
+            {error && <span className="error"> Error: {error}</span>}
           </div>
           <div className="footer-actions">
-            <button
-              className="btn btn-secondary"
-              onClick={() => alerts.forEach(alert => onDismiss(alert.id))}
-              disabled={alerts.length === 0}
-            >
-              Dismiss All
-            </button>
             <button className="btn btn-primary" onClick={onClose}>
               Close
             </button>
@@ -203,17 +202,7 @@ function AlertSystem({ alerts, onClose, onDismiss }) {
 }
 
 AlertSystem.propTypes = {
-  alerts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-      severity: PropTypes.oneOf(['high', 'medium', 'low']).isRequired,
-      timestamp: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   onClose: PropTypes.func.isRequired,
-  onDismiss: PropTypes.func.isRequired,
 };
 
 export default AlertSystem;
