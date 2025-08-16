@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+
+# Environment Variables
+.env
+# Instructions for Copilot AI Agents
+.github/instructions
+# Python Virtual Environmet
+.venv
+# Custom VS Code Settings
+.vscode
